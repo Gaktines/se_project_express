@@ -17,6 +17,19 @@ const clothingItem = new mongoose.Schema({
       validator: (v) => validator.isURL(v),
        message: 'This is not a Link',
        }
+  },
+  owner: {
+    type: String,
+    required: true,
+  },
+  likes: {
+    type: Number,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    required: true,
+    value: Date.now,
   }
 });
 
