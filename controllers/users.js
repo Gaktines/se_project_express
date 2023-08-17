@@ -6,7 +6,7 @@ const getUsers = (req, res) => {
   console.log(req);
   User.find({}).then((items) => res.status(200).send(items)).catch((e) => {
     if(e.name && e.name === 'ValidationError'){
-    const validationError = ValidationError();
+    const validationError = new ValidationError();
     return res.status(validationError.getStatusCode()).send({message:validationError.getMessage()});
     }
   })
@@ -19,7 +19,7 @@ const getUser = (req,res) => {
 
   User.findById(userId, {$set: {imageURL}}).orFail().then((item) => res.status(200).send({data:item})).catch((e) => {
     if(e.name && e.name === 'NotFoundError'){
-      const notFoundError = NotFoundError();
+      const notFoundError = new NotFoundError();
       return res.status(notFoundError.getStatusCode()).send({message:notFoundError.getMessage()});
       }
 });
@@ -37,7 +37,8 @@ const createUser = (req,res) => {
     res.send({data: item})
   }).catch((e) => {
     if(e.name && e.name === 'ValidationError'){
-      const validationError = ValidationError();
+      console.log(ValidationError);
+      const validationError = new ValidationError();
       return res.status(validationError.getStatusCode()).send({message:validationError.getMessage()});
       }
   })

@@ -12,7 +12,7 @@ const createItem = (req,res) => {
     res.send({data: item})
   }).catch((e) => {
     if(e.name && e.name === 'NotFoundError'){
-      const notFoundError = NotFoundError();
+      const notFoundError = new NotFoundError();
       return res.status(notFoundError.getStatusCode()).send({message:notFoundError.getMessage()});
       }
   })
@@ -22,7 +22,7 @@ const getItems = (req, res) => {
   console.log(req);
   ClothingItem.find({}).then((items) => res.status(200).send(items)).catch((e) => {
     if(e.name && e.name === 'ValidationError'){
-      const validationError = ValidationError();
+      const validationError = new ValidationError();
       return res.status(validationError.getStatusCode()).send({message:validationError.getMessage()});
       }
   })
@@ -34,7 +34,7 @@ const updateItem = (req,res) => {
 
   ClothingItem.findByIdAndUpdate(itemId, {$set: {imageURL}}).orFail().then((item) => res.status(200).send({data:item})).catch((e) => {
     if(e.name && e.name === 'NotFoundError'){
-      const notFoundError = NotFoundError();
+      const notFoundError = new NotFoundError();
       return res.status(notFoundError.getStatusCode()).send({message:notFoundError.getMessage()});
       }
 });
@@ -46,7 +46,7 @@ console.log(itemId);
 
 ClothingItem.findByIdAndDelete(itemId).orFail().then((item) => res.status(204).send({}).catch((e) => {
   if(e.name && e.name === 'NotFoundError'){
-    const notFoundError = NotFoundError();
+    const notFoundError = new NotFoundError();
     return res.status(notFoundError.getStatusCode()).send({message:notFoundError.getMessage()});
     }
 }));
