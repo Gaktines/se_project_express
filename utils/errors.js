@@ -22,4 +22,4 @@ class ServerError extends Error {
   }
 };
 
-export default {ValidationError, NotFoundError, ServerError};
+module.exports = {ValidationError, NotFoundError, ServerError};

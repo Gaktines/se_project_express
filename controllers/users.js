@@ -7,7 +7,7 @@ const getUsers = (req, res) => {
   User.find({}).then((items) => res.status(200).send(items)).catch((e) => {
     if(e.name && e.name === 'ValidationError'){
     const validationError = new ValidationError();
-    return res.status(validationError.getStatusCode()).send({message:validationError.getMessage()});
+    return res.status(validationError.get(this.statusCode)).send({message:validationError.get(message)});
     }
   })
 };
@@ -15,12 +15,13 @@ const getUsers = (req, res) => {
 // get User
 const getUser = (req,res) => {
   const {userId} = req.params;
-  const {imageURL} = req.body;
+  const {avatar} = req.body;
 
-  User.findById(userId, {$set: {imageURL}}).orFail().then((item) => res.status(200).send({data:item})).catch((e) => {
+
+  User.findById(userId, {$set: {avatar}}).orFail().then((item) => res.status(200).send({data:item})).catch((e) => {
     if(e.name && e.name === 'NotFoundError'){
       const notFoundError = new NotFoundError();
-      return res.status(notFoundError.getStatusCode()).send({message:notFoundError.getMessage()});
+      return res.status(notFoundError.get(this.statusCode)).send({message:notFoundError.get(message)});
       }
 });
 };
@@ -39,7 +40,7 @@ const createUser = (req,res) => {
     if(e.name && e.name === 'ValidationError'){
       console.log(ValidationError);
       const validationError = new ValidationError();
-      return res.status(validationError.getStatusCode()).send({message:validationError.getMessage()});
+      return res.status(validationError.get(this.statusCode)).send({message:validationError.get(message)});
       }
   })
 };

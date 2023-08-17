@@ -7,7 +7,7 @@ router.use("/clothingItems", clothingItem);
 
 router.use("/users", user);
 
-router.use("/likes", like);
+router.use("/items", like);
 
 
 router.use((req, res) => {

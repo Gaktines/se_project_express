@@ -3,8 +3,8 @@ const router = require('express').Router();
 const { likeItem, dislikeItem } = require('../controllers/likes');
 
 //Update
-router.put('/items/:itemId/likes', likeItem);
+router.put('/:itemId/likes', likeItem);
 //Delete
-router.delete('/items/:itemId/likes', dislikeItem);
+router.delete('/:itemId/likes', dislikeItem);
 
 module.exports = router;
