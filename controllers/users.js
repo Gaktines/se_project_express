@@ -5,7 +5,7 @@ const { ValidationError, NotFoundError } = require('../utils/errors');
 const getUsers = (req, res) => {
   console.log(req);
   User.find({}).then((items) => res.status(200).send(items)).catch((e) => {
-    if(err.name === 'ValidationError'){
+    if(e.name && e.name === 'ValidationError'){
     const validationError = ValidationError();
     return res.status(validationError.getStatusCode()).send({message:validationError.getMessage()});
     }
@@ -18,7 +18,7 @@ const getUser = (req,res) => {
   const {imageURL} = req.body;
 
   User.findById(userId, {$set: {imageURL}}).orFail().then((item) => res.status(200).send({data:item})).catch((e) => {
-    if(err.name === 'NotFoundError'){
+    if(e.name && e.name === 'NotFoundError'){
       const notFoundError = NotFoundError();
       return res.status(notFoundError.getStatusCode()).send({message:notFoundError.getMessage()});
       }
@@ -36,7 +36,7 @@ const createUser = (req,res) => {
     console.log(item);
     res.send({data: item})
   }).catch((e) => {
-    if(err.name === 'ValidationError'){
+    if(e.name && e.name === 'ValidationError'){
       const validationError = ValidationError();
       return res.status(validationError.getStatusCode()).send({message:validationError.getMessage()});
       }
