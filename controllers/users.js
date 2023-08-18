@@ -7,7 +7,7 @@ const getUsers = (req, res) => {
   User.find({}).then((items) => res.status(200).send(items)).catch((e) => {
     if(e.name && e.name === 'ValidationError'){
     const validationError = new ValidationError();
-    return res.status(validationError.get(this.statusCode)).send({message:validationError.get(message)});
+    return res.status(validationError.statusCode).send({message:validationError.message});
     }
   })
 };
@@ -17,11 +17,17 @@ const getUser = (req,res) => {
   const {userId} = req.params;
   const {avatar} = req.body;
 
-
   User.findById(userId, {$set: {avatar}}).orFail().then((item) => res.status(200).send({data:item})).catch((e) => {
+    console.log(e.name);
     if(e.name && e.name === 'NotFoundError'){
+      console.log('throwing a NotFoundError');
       const notFoundError = new NotFoundError();
-      return res.status(notFoundError.get(this.statusCode)).send({message:notFoundError.get(message)});
+      return res.status(notFoundError.statusCode).send({message:notFoundError.message});
+      } else {
+        console.log('throwing a validationError');
+        const validationError = new ValidationError();
+        console.log(validationError.message);
+      return res.status(validationError.statusCode).send(validationError.message);
       }
 });
 };
