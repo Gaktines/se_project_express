@@ -9,12 +9,16 @@ const createItem = (req,res) => {
 
   ClothingItem.create({name, weather, imageURL, owner, likes, createdAt}).then((item) => {
     console.log(item);
-    res.send({data: item})
+
+    res.send({data: item});
+
   }).catch((e) => {
+    console.log(e.name);
     if(e.name && e.name === 'NotFoundError'){
+      console.log("NotFoundError");
       const notFoundError = new NotFoundError();
-      return res.status(notFoundError.statusCode).send({message:notFoundError.message});
-      }
+      return res.status(notFoundError.statusCode).send(notFoundError.message);
+      };
   })
 };
 
@@ -23,7 +27,7 @@ const getItems = (req, res) => {
   ClothingItem.find({}).then((items) => res.status(200).send(items)).catch((e) => {
     if(e.name && e.name === 'ValidationError'){
       const validationError = new ValidationError();
-      return res.status(validationError.statusCode).send({message:validationError.message});
+      return res.status(validationError.statusCode).send(validationError.message);
       }
   })
 };
@@ -35,7 +39,7 @@ const updateItem = (req,res) => {
   ClothingItem.findByIdAndUpdate(itemId, {$set: {imageURL}}).orFail().then((item) => res.status(200).send({data:item})).catch((e) => {
     if(e.name && e.name === 'NotFoundError'){
       const notFoundError = new NotFoundError();
-      return res.status(notFoundError.statusCode).send({message:notFoundErrormessage});
+      return res.status(notFoundError.statusCode).send(notFoundErrormessage);
       }
 });
 };
@@ -47,11 +51,15 @@ console.log(itemId);
 ClothingItem.findByIdAndDelete(itemId).orFail().then((item) => res.status(204).send({}).catch((e) => {
   if(e.name && e.name === 'NotFoundError'){
     const notFoundError = new NotFoundError();
-    return res.status(notFoundError.statusCode).send({message:notFoundError.message});
+    return res.status(notFoundError.statusCode).send(notFoundError.message);
     }
 }));
 };
 
 module.exports = {
   createItem, getItems, updateItem, deleteItem
-}
+};
+
+module.exports.createClothingItem = (req, res) => {
+  console.log(req.user._id);// _id will become accessible
+};
