@@ -13,17 +13,16 @@ mongoose.connect(
   },
 );
 
-const routes = require('./routes');
-app.use(express.json());
-app.use(routes);
-
 app.use((req, res, next) => {
   req.user = {
-    _id: '64dd074d31aa06cfde4a5d34'// paste the _id of the test user created in the previous step
+    _id: '64e0dff5b3196b3152c996ce'// paste the _id of the test user created in the previous step
   };
   next();
 });
 
+const routes = require('./routes');
+app.use(express.json());
+app.use(routes);
 
 app.listen(PORT, () => {
   console.log(`App is listening at port: ${PORT}`);

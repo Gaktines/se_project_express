@@ -5,6 +5,7 @@ const { ValidationError, NotFoundError } = require('../utils/errors');
 const getUsers = (req, res) => {
   console.log(req);
   User.find({}).then((items) => res.status(200).send(items)).catch((e) => {
+    console.log(e);
     if(e.name && e.name === 'ValidationError'){
     const validationError = new ValidationError();
     return res.status(validationError.statusCode).send(validationError.message);
@@ -18,7 +19,7 @@ const getUser = (req,res) => {
   const {avatar} = req.body;
 
   User.findById(userId, {$set: {avatar}}).orFail().then((item) => res.status(200).send({data:item})).catch((e) => {
-    console.log(e.name);
+    console.log(e);
     if(e.name && e.name === 'NotFoundError'){
       console.log('throwing a NotFoundError');
       const notFoundError = new NotFoundError();
