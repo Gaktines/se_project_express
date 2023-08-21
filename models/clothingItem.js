@@ -10,11 +10,11 @@ const clothingItem = new mongoose.Schema({
     type: String,
     required: true,
   },
-  imageURL: {
+  imageUrl: {
     type: String,
     required: true,
     validate: {
-      validator: (v) => validator.isURL(v),
+      validator: (v) => validator.isUrl(v),
        message: 'This is not a Link',
        }
   },

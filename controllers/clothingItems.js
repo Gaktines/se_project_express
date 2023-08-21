@@ -2,14 +2,14 @@ const ClothingItem = require("../models/clothingItem");
 const { ValidationError, NotFoundError } = require("../utils/errors");
 
 const createItem = (req, res) => {
-  console.log(req);
+  //console.log(req);
   console.log(req.body);
 
-  const { name, weather, imageURL } = req.body;
+  const { name, weather, imageUrl } = req.body;
 
-  console.log(imageURL);
+  console.log(imageUrl);
 
-  ClothingItem.create({ name, weather, imageURL, owner: req.user._id })
+  ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => {
       console.log(item);
 
@@ -46,9 +46,9 @@ const getItems = (req, res) => {
 
 const updateItem = (req, res) => {
   const { itemId } = req.params;
-  const { imageURL } = req.body;
+  const { imageUrl } = req.body;
 
-  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageURL } })
+  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
     .catch((e) => {
