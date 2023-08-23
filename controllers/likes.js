@@ -1,5 +1,5 @@
 const ClothingItem = require("../models/clothingItem");
-const { ValidationError } = require("../utils/errors");
+const { ValidationError, CastError } = require("../utils/errors");
 
 module.exports.likeItem = (req, res) =>
   ClothingItem.findByIdAndUpdate(
@@ -14,7 +14,12 @@ module.exports.likeItem = (req, res) =>
         const validationError = new ValidationError();
         return res
           .status(validationError.statusCode)
-          .send({message:validationError.message});
+          .send({ message: validationError.message });
+      } else if (e.name && e.name === "CastError") {
+        const castError = new CastError();
+        return res
+          .status(castError.statusCode)
+          .send({ message: castError.message });
       }
     });
 
@@ -31,6 +36,6 @@ module.exports.dislikeItem = (req, res) =>
         const validationError = new ValidationError();
         return res
           .status(validationError.statusCode)
-          .send({message:validationError.message});
+          .send({ message: validationError.message });
       }
     });
