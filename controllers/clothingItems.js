@@ -12,7 +12,7 @@ const createItem = (req, res) => {
   ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => {
       console.log(item);
-
+      console.log(req.user._id);
       res.send({ data: item });
     })
     .catch((e) => {
