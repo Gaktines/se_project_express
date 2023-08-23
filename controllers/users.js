@@ -8,8 +8,12 @@ const getUsers = (req, res) => {
     console.log(e);
     if(e.name && e.name === 'ValidationError'){
     const validationError = new ValidationError();
-    return res.status(validationError.statusCode).send(validationError.message);
-    }
+    return res.status(validationError.statusCode).send({message:validationError.message});
+    }else if(e.name && e.name === 'NotFoundError'){
+      console.log('throwing a NotFoundError');
+      const notFoundError = new NotFoundError();
+      return res.status(notFoundError.statusCode).send({message:notFoundError.message});
+      }
   })
 };
 
@@ -23,12 +27,12 @@ const getUser = (req,res) => {
     if(e.name && e.name === 'NotFoundError'){
       console.log('throwing a NotFoundError');
       const notFoundError = new NotFoundError();
-      return res.status(notFoundError.statusCode).send(notFoundError.message);
-      } else {
+      return res.status(notFoundError.statusCode).send({message:notFoundError.message});
+      } else if(e.name && e.name === 'ValidationError') {
         console.log('throwing a validationError');
         const validationError = new ValidationError();
         console.log(validationError.message);
-      return res.status(validationError.statusCode).send(validationError.message);
+      return res.status(validationError.statusCode).send({message:validationError.message});
       }
 });
 };
@@ -47,7 +51,7 @@ const createUser = (req,res) => {
     if(e.name && e.name === 'ValidationError'){
       console.log(ValidationError);
       const validationError = new ValidationError();
-      return res.status(validationError.statusCode).send(validationError.message);
+      return res.status(validationError.statusCode).send({message:validationError.message});
       }
   })
 };

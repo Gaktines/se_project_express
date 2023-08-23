@@ -20,12 +20,14 @@ const createItem = (req, res) => {
       if (e.name && e.name === "NotFoundError") {
         console.log("NotFoundError");
         const notFoundError = new NotFoundError();
-        return res.status(notFoundError.statusCode).send(notFoundError.message);
+        return res
+          .status(notFoundError.statusCode)
+          .send({ message: notFoundError.message });
       } else if (e.name === "ValidationError") {
         const validationError = new ValidationError();
         return res
           .status(validationError.statusCode)
-          .send(validationError.message);
+          .send({ message: validationError.message });
       }
     });
 };
@@ -39,7 +41,7 @@ const getItems = (req, res) => {
         const validationError = new ValidationError();
         return res
           .status(validationError.statusCode)
-          .send(validationError.message);
+          .send({ message: validationError.message });
       }
     });
 };
@@ -54,7 +56,9 @@ const updateItem = (req, res) => {
     .catch((e) => {
       if (e.name && e.name === "NotFoundError") {
         const notFoundError = new NotFoundError();
-        return res.status(notFoundError.statusCode).send(notFoundErrormessage);
+        return res
+          .status(notFoundError.statusCode)
+          .send({ message: notFoundErrormessage });
       }
     });
 };
@@ -74,7 +78,7 @@ const deleteItem = (req, res) => {
             const notFoundError = new NotFoundError();
             return res
               .status(notFoundError.statusCode)
-              .send(notFoundError.message);
+              .send({ message: notFoundError.message });
           }
         }),
     );

@@ -1,4 +1,5 @@
 const ClothingItem = require("../models/clothingItem");
+const { ValidationError } = require("../utils/errors");
 
 module.exports.likeItem = (req, res) =>
   ClothingItem.findByIdAndUpdate(
@@ -6,12 +7,15 @@ module.exports.likeItem = (req, res) =>
     { $addToSet: { likes: req.user._id } }, // add _id to the array if it's not there yet
     { new: true },
   )
-    .then((res) => {
-      console.log(res);
-      return res.json;
-    })
-    .catch((err) => {
-      console.error(err);
+    .then((items) => res.status(200).send(items))
+    .catch((e) => {
+      console.log(e);
+      if (e.name && e.name === "ValidationError") {
+        const validationError = new ValidationError();
+        return res
+          .status(validationError.statusCode)
+          .send({message:validationError.message});
+      }
     });
 
 module.exports.dislikeItem = (req, res) =>
@@ -20,10 +24,13 @@ module.exports.dislikeItem = (req, res) =>
     { $pull: { likes: req.user._id } }, // remove _id from the array
     { new: true },
   )
-    .then((res) => {
-      console.log(res);
-      return res.json;
-    })
-    .catch((err) => {
-      console.error(err);
+    .then((items) => res.status(200).send(items))
+    .catch((e) => {
+      console.log(e);
+      if (e.name && e.name === "ValidationError") {
+        const validationError = new ValidationError();
+        return res
+          .status(validationError.statusCode)
+          .send({message:validationError.message});
+      }
     });
