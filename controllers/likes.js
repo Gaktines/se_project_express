@@ -10,16 +10,16 @@ module.exports.likeItem = (req, res) =>
     .then((items) => res.status(200).send(items))
     .catch((e) => {
       console.log(e);
-      if (e.name && e.name === "ValidationError") {
-        const validationError = new ValidationError();
-        return res
-          .status(validationError.statusCode)
-          .send({ message: validationError.message });
-      } else if (e.name && e.name === "CastError") {
+      if (e.name && e.name === "CastError") {
         const castError = new CastError();
         return res
           .status(castError.statusCode)
           .send({ message: castError.message });
+      } else if (e.name && e.name === "ValidationError") {
+        const validationError = new ValidationError();
+        return res
+          .status(validationError.statusCode)
+          .send({ message: validationError.message });
       }
     });
 
@@ -32,7 +32,12 @@ module.exports.dislikeItem = (req, res) =>
     .then((items) => res.status(200).send(items))
     .catch((e) => {
       console.log(e);
-      if (e.name && e.name === "ValidationError") {
+      if (e.name && e.name === "CastError") {
+        const castError = new CastError();
+        return res
+          .status(castError.statusCode)
+          .send({ message: castError.message });
+      } else if (e.name && e.name === "ValidationError") {
         const validationError = new ValidationError();
         return res
           .status(validationError.statusCode)

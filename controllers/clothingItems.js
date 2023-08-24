@@ -1,5 +1,9 @@
 const ClothingItem = require("../models/clothingItem");
-const { ValidationError, NotFoundError } = require("../utils/errors");
+const {
+  ValidationError,
+  NotFoundError,
+  CastError,
+} = require("../utils/errors");
 
 const createItem = (req, res) => {
   //console.log(req);
@@ -68,7 +72,12 @@ const deleteItem = (req, res) => {
   console.log(itemId);
 
   ClothingItem.findByIdAndDelete(itemId)
-    .orFail()
+    .orFail(() => {
+      const castError = new CastError();
+      return res
+        .status(castError.statusCode)
+        .send({ message: castError.message });
+    })
     .then((item) =>
       res
         .status(204)
@@ -79,6 +88,11 @@ const deleteItem = (req, res) => {
             return res
               .status(notFoundError.statusCode)
               .send({ message: notFoundError.message });
+          } else if (e.name && e.name === "CastError") {
+            const castError = new CastError();
+            return res
+              .status(castError.statusCode)
+              .send({ message: castError.message });
           }
         }),
     );
