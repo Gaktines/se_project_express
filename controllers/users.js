@@ -1,5 +1,9 @@
 const User = require("../models/user");
-const { ValidationError, NotFoundError } = require("../utils/errors");
+const {
+  ValidationError,
+  NotFoundError,
+  CastError,
+} = require("../utils/errors");
 
 // get Users
 const getUsers = (req, res) => {
