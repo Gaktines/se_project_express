@@ -2,6 +2,7 @@ const ClothingItem = require("../models/clothingItem");
 const { ValidationError } = require("../utils/errors/ValidationError");
 const { CastError } = require("../utils/errors/CastError");
 const { NotFoundError } = require("../utils/errors/NotFoundError");
+const { ServerError } = require("../utils/errors/ServerError");
 
 module.exports.likeItem = (req, res) =>
   ClothingItem.findByIdAndUpdate(
@@ -9,12 +10,7 @@ module.exports.likeItem = (req, res) =>
     { $addToSet: { likes: req.user._id } }, // add _id to the array if it's not there yet
     { new: true },
   )
-    .orFail(() => {
-      const notFoundError = new NotFoundError();
-      return res
-        .status(notFoundError.statusCode)
-        .send({ message: notFoundError.message });
-    })
+    .orFail(() => new NotFoundError())
     .then((items) => res.status(200).send(items))
     .catch((e) => {
       console.log(e);
@@ -28,11 +24,16 @@ module.exports.likeItem = (req, res) =>
         return res
           .status(validationError.statusCode)
           .send({ message: validationError.message });
-      }
+      } if (e.name &&  e.name === "NotFoundError"){
         const notFoundError = new NotFoundError();
         return res
           .status(notFoundError.statusCode)
           .send({ message: notFoundError.message });
+      }
+      const serverError = new ServerError();
+        return res
+          .status(serverError.statusCode)
+          .send({ message: serverError.message });
     });
 
 module.exports.dislikeItem = (req, res) =>
@@ -41,12 +42,7 @@ module.exports.dislikeItem = (req, res) =>
     { $pull: { likes: req.user._id } }, // remove _id from the array
     { new: true },
   )
-    .orFail(() => {
-      const notFoundError = new NotFoundError();
-      return res
-        .status(notFoundError.statusCode)
-        .send({ message: notFoundError.message });
-    })
+    .orFail(() => new NotFoundError())
     .then((items) => res.status(200).send(items))
     .catch((e) => {
       console.log(e);
@@ -61,9 +57,14 @@ module.exports.dislikeItem = (req, res) =>
         return res
           .status(validationError.statusCode)
           .send({ message: validationError.message });
-      }
+      } if (e.name && e.name === "NotFoundError") {
         const notFoundError = new NotFoundError();
         return res
           .status(notFoundError.statusCode)
           .send({ message: notFoundError.message });
+      }
+      const serverError = new ServerError();
+        return res
+          .status(serverError.statusCode)
+          .send({ message: serverError.message });
     });

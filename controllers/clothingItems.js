@@ -20,28 +20,18 @@ const createItem = (req, res) => {
     })
     .catch((e) => {
       console.log(e);
-      if (e.name === "ServerError") {
-        const serverError = new ServerError();
-        return res
-          .status(serverError.statusCode)
-          .send({ message: serverError.message });
-      }
       if (e.name === "ValidationError") {
         const validationError = new ValidationError();
         return res
           .status(validationError.statusCode)
           .send({ message: validationError.message });
       }
-
-        console.log("NotFoundError");
-        const notFoundError = new NotFoundError();
-        return res
-          .status(notFoundError.statusCode)
-          .send({ message: notFoundError.message });
-      });
-
-    };
-
+      const serverError = new ServerError();
+      return res
+        .status(serverError.statusCode)
+        .send({ message: serverError.message });
+    });
+};
 
 const getItems = (req, res) => {
   console.log(req);
@@ -61,36 +51,30 @@ const deleteItem = (req, res) => {
   console.log(itemId);
 
   ClothingItem.findByIdAndDelete(itemId)
-    .orFail(() => {
-      const notFoundError = new NotFoundError();
-      return res
-        .status(notFoundError.statusCode)
-        .send({ message: notFoundError.message });
-    })
+    .orFail(() => new NotFoundError())
     .then(() =>
       res
         .status(200)
         .send({ message: "item deleted" })
-        .catch((e) => {
-          if (e.name === "ServerError") {
-            const serverError = new ServerError();
-            return res
-              .status(serverError.statusCode)
-              .send({ message: serverError.message });
-          }
-          if (e.name && e.name === "NotFoundError") {
-            const notFoundError = new NotFoundError();
-            return res
-              .status(notFoundError.statusCode)
-              .send({ message: notFoundError.message });
-          }
-            const castError = new CastError();
-            return res
-              .status(castError.statusCode)
-              .send({ message: castError.message });
-        }),
-    );
-};
+    ).catch((e) => {
+      if (e.name === "CastError") {
+        const castError = new CastError();
+        return res
+          .status(castError.statusCode)
+          .send({ message: castError.message });
+      }
+      if (e.name && e.name === "NotFoundError") {
+        const notFoundError = new NotFoundError();
+        return res
+          .status(notFoundError.statusCode)
+          .send({ message: notFoundError.message });
+      }
+        const serverError = new ServerError();
+        return res
+          .status(serverError.statusCode)
+          .send({ message: serverError.message });
+    });
+  }
 
 module.exports = {
   createItem,
@@ -98,6 +82,4 @@ module.exports = {
   deleteItem,
 };
 
-module.exports.createClothingItem = (req) => {
-  console.log(req.user._id); // _id will become accessible
-};
+

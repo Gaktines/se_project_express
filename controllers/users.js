@@ -23,12 +23,7 @@ const getUser = (req, res) => {
   const { userId } = req.params;
 
   User.findById(userId)
-    .orFail(() => {
-      const notFoundError = new NotFoundError();
-      return res
-        .status(notFoundError.statusCode)
-        .send({ message: notFoundError.message });
-    })
+    .orFail(() => new NotFoundError())
     .then((item) => res.status(200).send({ data: item }))
     .catch((e) => {
       console.log(e);
