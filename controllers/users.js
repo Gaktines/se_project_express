@@ -45,13 +45,10 @@ const getUser = (req, res) => {
           .status(notFoundError.statusCode)
           .send({ message: notFoundError.message });
       }
-      if (e.name === "ServerError") {
         const serverError = new ServerError();
         return res
           .status(serverError.statusCode)
           .send({ message: serverError.message });
-      }
-      return;
     });
 };
 
@@ -75,7 +72,10 @@ const createUser = (req, res) => {
           .status(validationError.statusCode)
           .send({ message: validationError.message });
       }
-      return;
+      const serverError = new ServerError();
+      return res
+        .status(serverError.statusCode)
+        .send({ message: serverError.message });
     });
 };
 

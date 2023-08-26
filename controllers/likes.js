@@ -23,20 +23,16 @@ module.exports.likeItem = (req, res) =>
         return res
           .status(castError.statusCode)
           .send({ message: castError.message });
-      }
-      if (e.name && e.name === "ValidationError") {
+      } if (e.name && e.name === "ValidationError") {
         const validationError = new ValidationError();
         return res
           .status(validationError.statusCode)
           .send({ message: validationError.message });
       }
-      if (e.name && e.name === "NotFoundError") {
         const notFoundError = new NotFoundError();
         return res
           .status(notFoundError.statusCode)
           .send({ message: notFoundError.message });
-      }
-      return;
     });
 
 module.exports.dislikeItem = (req, res) =>
@@ -66,11 +62,8 @@ module.exports.dislikeItem = (req, res) =>
           .status(validationError.statusCode)
           .send({ message: validationError.message });
       }
-      if (e.name && e.name === "NotFoundError") {
         const notFoundError = new NotFoundError();
         return res
           .status(notFoundError.statusCode)
           .send({ message: notFoundError.message });
-      }
-      return;
     });

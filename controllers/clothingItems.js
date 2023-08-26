@@ -32,16 +32,16 @@ const createItem = (req, res) => {
           .status(validationError.statusCode)
           .send({ message: validationError.message });
       }
-      if (e.name === "NotFoundError") {
+
         console.log("NotFoundError");
         const notFoundError = new NotFoundError();
         return res
           .status(notFoundError.statusCode)
           .send({ message: notFoundError.message });
-      }
-      return;
-    });
-};
+      });
+
+    };
+
 
 const getItems = (req, res) => {
   console.log(req);
@@ -84,13 +84,10 @@ const deleteItem = (req, res) => {
               .status(notFoundError.statusCode)
               .send({ message: notFoundError.message });
           }
-          if (e.name && e.name === "CastError") {
             const castError = new CastError();
             return res
               .status(castError.statusCode)
               .send({ message: castError.message });
-          }
-          return;
         }),
     );
 };
