@@ -1,8 +1,10 @@
+const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const { ValidationError } = require("../utils/errors/ValidationError");
 const { NotFoundError } = require("../utils/errors/NotFoundError");
 const { CastError } = require("../utils/errors/CastError");
 const { ServerError } = require("../utils/errors/ServerError");
+const { DuplicateEmailError } = require("../utils/errors/DuplicateEmailError");
 
 // get Users
 const getUsers = (req, res) => {
@@ -40,10 +42,10 @@ const getUser = (req, res) => {
           .status(notFoundError.statusCode)
           .send({ message: notFoundError.message });
       }
-        const serverError = new ServerError();
-        return res
-          .status(serverError.statusCode)
-          .send({ message: serverError.message });
+      const serverError = new ServerError();
+      return res
+        .status(serverError.statusCode)
+        .send({ message: serverError.message });
     });
 };
 
@@ -52,30 +54,59 @@ const createUser = (req, res) => {
   console.log(req);
   console.log(req.body);
 
-  const { name, avatar } = req.body;
+  const { name, avatar, email, password } = req.body;
 
-  User.create({ name, avatar })
-    .then((item) => {
-      console.log(item);
-      res.send({ data: item });
-    })
-    .catch((e) => {
-      if (e.name && e.name === "ValidationError") {
-        console.log(ValidationError);
-        const validationError = new ValidationError();
+  User.findOne({ email }).then((user) => {
+    if (!user) {
+      return Promise.reject(new Error('Incorrect password or email'));
+    }
+    const duplicateEmailError = DuplicateEmailError();
+          return res
+            .status(duplicateEmailError.statusCode)
+            .send({ message: duplicateEmailError.message });
+  });
+
+  bcrypt.hash(req.body.password, 10).then((hash) =>
+    User.create({ name, avatar, email, password: hash })
+      .then((item) => {
+        console.log(item);
+        res.send({ data: item });
+      })
+      .catch((e) => {
+        if (e.name && e.name === "ValidationError") {
+          console.log(ValidationError);
+          const validationError = new ValidationError();
+          return res
+            .status(validationError.statusCode)
+            .send({ message: validationError.message });
+        }
+        const serverError = new ServerError();
         return res
-          .status(validationError.statusCode)
-          .send({ message: validationError.message });
-      }
-      const serverError = new ServerError();
-      return res
-        .status(serverError.statusCode)
-        .send({ message: serverError.message });
-    });
+          .status(serverError.statusCode)
+          .send({ message: serverError.message });
+      }),
+  );
+};
+
+const login = (req, res) => {
+const {email, password} = req.body;
+
+User.findUserByCredentials(email, password)
+  .then(user => {
+        // we get the user object if the email and password match
+        if(){
+          
+        }
+  })
+  .catch((e) => {
+        // otherwise, we get an error
+        return Promise.reject(new Error('Incorrect password or email'));
+  });
 };
 
 module.exports = {
   getUsers,
   getUser,
   createUser,
+  login
 };

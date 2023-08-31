@@ -16,6 +16,20 @@ const user = new mongoose.Schema({
       message: "This is not a Link",
     },
   },
+  email: {
+    type: String,
+    unique: true,
+    required: true,
+    validate: {
+      validator: (v) => validator.isEmail(v),
+      message: "This is not a valid email",
+    }
+  },
+  password: {
+    type: String,
+    required: true,
+    minLength: 8,
+  }
 });
 
 module.exports = mongoose.model("users", user);
