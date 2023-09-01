@@ -5,6 +5,7 @@ const { NotFoundError } = require("../utils/errors/NotFoundError");
 const { CastError } = require("../utils/errors/CastError");
 const { ServerError } = require("../utils/errors/ServerError");
 const { DuplicateEmailError } = require("../utils/errors/DuplicateEmailError");
+const { JWT_SECRET } = require("../utils/config");
 
 // get Users
 const getUsers = (req, res) => {
@@ -58,12 +59,12 @@ const createUser = (req, res) => {
 
   User.findOne({ email }).then((user) => {
     if (!user) {
-      return Promise.reject(new Error('Incorrect password or email'));
+      return Promise.reject(new Error("Incorrect password or email"));
     }
     const duplicateEmailError = DuplicateEmailError();
-          return res
-            .status(duplicateEmailError.statusCode)
-            .send({ message: duplicateEmailError.message });
+    return res
+      .status(duplicateEmailError.statusCode)
+      .send({ message: duplicateEmailError.message });
   });
 
   bcrypt.hash(req.body.password, 10).then((hash) =>
@@ -89,24 +90,46 @@ const createUser = (req, res) => {
 };
 
 const login = (req, res) => {
-const {email, password} = req.body;
+  const { email, password } = req.body;
 
-User.findUserByCredentials(email, password)
-  .then(user => {
-        // we get the user object if the email and password match
-        if(){
-          
-        }
-  })
-  .catch((e) => {
-        // otherwise, we get an error
-        return Promise.reject(new Error('Incorrect password or email'));
-  });
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      // we get the user object if the email and password match
+      if (email === req.body.email && password === req.body.passowrd) {
+        const token = jwt
+          .sign({ _id: user._id }, JWT_SECRET, {
+            expiresIn: "7d",
+          })
+          .then((user) => {
+            res.status(201).send({ _id: user._id, email: user.email });
+          })
+          .catch((e) => {
+            if (e.name && e.name === "ValidationError") {
+              console.log(ValidationError);
+              const validationError = new ValidationError();
+              return res
+                .status(validationError.statusCode)
+                .send({ message: validationError.message });
+            }
+            const serverError = new ServerError();
+            return res
+              .status(serverError.statusCode)
+              .send({ message: serverError.message });
+          });
+      }
+    })
+    .catch((e) => {
+      // otherwise, we get an error
+      const duplicateEmailError = DuplicateEmailError();
+      return res
+        .status(duplicateEmailError.statusCode)
+        .send({ message: duplicateEmailError.message });
+    });
 };
 
 module.exports = {
   getUsers,
   getUser,
   createUser,
-  login
+  login,
 };
