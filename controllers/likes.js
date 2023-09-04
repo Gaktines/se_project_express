@@ -10,6 +10,7 @@ module.exports.likeItem = (req, res) =>
     { $addToSet: { likes: req.user._id } }, // add _id to the array if it's not there yet
     { new: true },
   )
+
     .orFail(() => new NotFoundError())
     .then((items) => res.status(200).send(items))
     .catch((e) => {
@@ -34,6 +35,7 @@ module.exports.likeItem = (req, res) =>
         return res
           .status(serverError.statusCode)
           .send({ message: serverError.message });
+          
     });
 
 module.exports.dislikeItem = (req, res) =>
