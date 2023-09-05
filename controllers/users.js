@@ -15,6 +15,7 @@ const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
   User.findOne({ email }).then((user) => {
+    console.log(user);
     if (!user) {
       return Promise.reject(new Error("Incorrect password or email"));
     }
