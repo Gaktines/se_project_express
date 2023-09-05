@@ -5,6 +5,7 @@ const { NotFoundError } = require("../utils/errors/NotFoundError");
 const { CastError } = require("../utils/errors/CastError");
 const { ServerError } = require("../utils/errors/ServerError");
 const { DuplicateEmailError } = require("../utils/errors/DuplicateEmailError");
+const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require("../utils/config");
 
 // create User
@@ -12,24 +13,24 @@ const createUser = (req, res) => {
   console.log(req);
   console.log(req.body);
 
-  const { name, avatar, email, password } = req.body;
+  const { name, avatar, email } = req.body;
 
   User.findOne({ email }).then((user) => {
     console.log(user);
-    if (!user) {
-      return Promise.reject(new Error("Incorrect password or email"));
+    if (user) {
+      const duplicateEmailError = new DuplicateEmailError();
+      return res
+        .status(duplicateEmailError.statusCode)
+        .send({ message: duplicateEmailError.message });
     }
-    const duplicateEmailError = DuplicateEmailError();
-    return res
-      .status(duplicateEmailError.statusCode)
-      .send({ message: duplicateEmailError.message });
   });
 
   bcrypt.hash(req.body.password, 10).then((hash) =>
     User.create({ name, avatar, email, password: hash })
-      .then((item) => {
-        console.log(item);
-        res.send({ data: item });
+      .then((user) => {
+        console.log(user);
+        res.send({ data: user });
+        console.log({ data: user });
       })
       .catch((e) => {
         if (e.name && e.name === "ValidationError") {
@@ -78,7 +79,7 @@ const login = (req, res) => {
     })
     .catch((e) => {
       // otherwise, we get an error
-      const duplicateEmailError = DuplicateEmailError();
+      const duplicateEmailError = new DuplicateEmailError();
       return res
         .status(duplicateEmailError.statusCode)
         .send({ message: duplicateEmailError.message });
