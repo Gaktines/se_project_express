@@ -5,7 +5,7 @@ const { NotFoundError } = require("../utils/errors/NotFoundError");
 const { CastError } = require("../utils/errors/CastError");
 const { ServerError } = require("../utils/errors/ServerError");
 const { DuplicateEmailError } = require("../utils/errors/DuplicateEmailError");
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
 
 // create User
@@ -29,8 +29,9 @@ const createUser = (req, res) => {
     User.create({ name, avatar, email, password: hash })
       .then((user) => {
         console.log(user);
-        res.send({ data: user });
-        console.log({ data: user });
+        res.status(200).res.send({
+          data: { name: user.name, avatar: user.avatar, email: user.email },
+        });
       })
       .catch((e) => {
         if (e.name && e.name === "ValidationError") {
