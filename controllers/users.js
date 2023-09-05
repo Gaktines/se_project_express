@@ -23,30 +23,29 @@ const createUser = (req, res) => {
         .status(duplicateEmailError.statusCode)
         .send({ message: duplicateEmailError.message });
     }
-  });
-
-  bcrypt.hash(req.body.password, 10).then((hash) =>
-    User.create({ name, avatar, email, password: hash })
-      .then((user) => {
-        console.log(user);
-        res.status(200).send({
-          data: { name: user.name, avatar: user.avatar, email: user.email },
-        });
-      })
-      .catch((e) => {
-        if (e.name && e.name === "ValidationError") {
-          console.log(ValidationError);
-          const validationError = new ValidationError();
+    bcrypt.hash(req.body.password, 10).then((hash) =>
+      User.create({ name, avatar, email, password: hash })
+        .then((user) => {
+          console.log(user);
+          res.status(200).send({
+            data: { name: user.name, avatar: user.avatar, email: user.email },
+          });
+        })
+        .catch((e) => {
+          if (e.name && e.name === "ValidationError") {
+            console.log(ValidationError);
+            const validationError = new ValidationError();
+            return res
+              .status(validationError.statusCode)
+              .send({ message: validationError.message });
+          }
+          const serverError = new ServerError();
           return res
-            .status(validationError.statusCode)
-            .send({ message: validationError.message });
-        }
-        const serverError = new ServerError();
-        return res
-          .status(serverError.statusCode)
-          .send({ message: serverError.message });
-      }),
-  );
+            .status(serverError.statusCode)
+            .send({ message: serverError.message });
+        }),
+    );
+  });
 };
 
 const login = (req, res) => {
