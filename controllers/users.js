@@ -53,33 +53,23 @@ const login = (req, res) => {
 
   User.findUserByCredentials(email, password)
     .then((user) => {
-      // we get the user object if the email and password match
-      if (email === req.body.email && password === req.body.passowrd) {
-        const token = jwt
-          .sign({ _id: user._id }, JWT_SECRET, {
-            expiresIn: "7d",
-          })
-          .then((user) => {
-            res.status(201).send({ _id: user._id, email: user.email, token });
-          })
-          .catch((e) => {
-            if (e.name && e.name === "ValidationError") {
-              console.log(ValidationError);
-              const validationError = new ValidationError();
-              return res
-                .status(validationError.statusCode)
-                .send({ message: validationError.message });
-            }
-            const serverError = new ServerError();
-            return res
-              .status(serverError.statusCode)
-              .send({ message: serverError.message });
-          });
-      }
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: "7d",
+      });
+      res.status(201).send({ token });
     })
     .catch((e) => {
-      console.error(e);
-   
+      if (e.name && e.name === "ValidationError") {
+        console.log(ValidationError);
+        const validationError = new ValidationError();
+        return res
+          .status(validationError.statusCode)
+          .send({ message: validationError.message });
+      }
+      const serverError = new ServerError();
+      return res
+        .status(serverError.statusCode)
+        .send({ message: serverError.message });
     });
 };
 
