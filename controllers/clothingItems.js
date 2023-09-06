@@ -49,12 +49,13 @@ const getItems = (req, res) => {
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
+  const { owner } = req.body;
   console.log(itemId);
 
   ClothingItem.findById(itemId)
     .orFail(() => new NotFoundError())
     .then((item) => {
-      if (item.owner.id !== itemId) {
+      if (item.owner.id !== owner) {
         const forbiddenError = new ForbiddenError();
         throw forbiddenError
       } else {
