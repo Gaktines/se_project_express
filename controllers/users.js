@@ -6,7 +6,6 @@ const { CastError } = require("../utils/errors/CastError");
 const { ServerError } = require("../utils/errors/ServerError");
 const { DuplicateEmailError } = require("../utils/errors/DuplicateEmailError");
 const { AuthorizationError } = require("../utils/errors/AuthorizationError");
-)
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
 
@@ -74,9 +73,9 @@ const login = (req, res) => {
           .send({ message: serverError.message });
       }
       const authorizationError = new AuthorizationError();
-        return res
-          .status(authorizationError.statusCode)
-          .send({ message: validationError.message });
+      return res
+        .status(authorizationError.statusCode)
+        .send({ message: authorizationError.message });
     });
 };
 
