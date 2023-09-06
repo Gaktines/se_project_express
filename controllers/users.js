@@ -78,20 +78,17 @@ const login = (req, res) => {
       }
     })
     .catch((e) => {
-      // otherwise, we get an error
-      const duplicateEmailError = new DuplicateEmailError();
-      return res
-        .status(duplicateEmailError.statusCode)
-        .send({ message: duplicateEmailError.message });
+      console.error(e);
+   
     });
 };
 
 const getCurrentUser = (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.user._id;
 
   User.findById(userId)
     .orFail(() => new NotFoundError())
-    .then((item) => res.status(200).send({ data: item }))
+    .then((user) => res.status(200).send({ data: user }))
     .catch((e) => {
       console.log(e);
       if (e.name && e.name === "CastError") {
