@@ -54,11 +54,9 @@ const deleteItem = (req, res) => {
   ClothingItem.findById(itemId)
     .orFail(() => new NotFoundError())
     .then((item) => {
-      if (item.owner.id !== item.id) {
+      if (item.owner.id !== itemId) {
         const forbiddenError = new ForbiddenError();
-        return res
-          .status(forbiddenError.statusCode)
-          .res.send({ message: forbiddenError.message });
+        throw forbiddenError
       } else {
         return ClothingItem.findByIdAndDelete(itemId)
           .orFail(() => new NotFoundError())
