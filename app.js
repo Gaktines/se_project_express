@@ -19,6 +19,9 @@ mongoose.connect(
 );
 
 const routes = require('./routes');
+
+app.use(cors());
+
 app.use(express.json());
 app.post('/signin', login);
 app.post('/signup', createUser);
@@ -28,7 +31,7 @@ app.use(auth);
 
 app.use(routes);
 
-app.use(cors());
+
 
 app.listen(PORT, () => {
   console.log(`App is listening at port: ${PORT}`);
