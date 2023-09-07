@@ -55,7 +55,7 @@ const deleteItem = (req, res) => {
   ClothingItem.findById(itemId)
     .orFail(() => new NotFoundError())
     .then((item) => {
-      if (String(item.owner) === owner) {
+      if (item.owner.equals(owner)) {
         return ClothingItem.findByIdAndDelete(itemId)
           .orFail(() => new NotFoundError())
           .then(() => res.status(200).send({ message: "item deleted" }))
