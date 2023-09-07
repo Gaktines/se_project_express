@@ -49,13 +49,13 @@ const getItems = (req, res) => {
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
-  const { owner } = req.body;
+
   console.log(itemId);
 
   ClothingItem.findById(itemId)
     .orFail(() => new NotFoundError())
     .then((item) => {
-      if (item.owner.equals(owner)) {
+      if (item.owner.equals(req.user._id)) {
         return ClothingItem.findByIdAndDelete(itemId)
           .orFail(() => new NotFoundError())
           .then(() => res.status(200).send({ message: "item deleted" }))
