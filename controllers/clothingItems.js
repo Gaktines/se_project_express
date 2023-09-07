@@ -55,10 +55,7 @@ const deleteItem = (req, res) => {
   ClothingItem.findById(itemId)
     .orFail(() => new NotFoundError())
     .then((item) => {
-      if (item.owner.id !== owner) {
-        const forbiddenError = new ForbiddenError();
-        throw forbiddenError
-      } else {
+      if (item.owner.equals(owner)) {
         return ClothingItem.findByIdAndDelete(itemId)
           .orFail(() => new NotFoundError())
           .then(() => res.status(200).send({ message: "item deleted" }))
@@ -80,6 +77,9 @@ const deleteItem = (req, res) => {
               .status(serverError.statusCode)
               .send({ message: serverError.message });
           });
+      } else {
+        const forbiddenError = new ForbiddenError();
+        throw forbiddenError;
       }
     });
 };
