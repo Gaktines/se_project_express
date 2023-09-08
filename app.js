@@ -1,6 +1,5 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const auth = require("./middlewares/auth");
 const cors = require("cors");
 const clothingItem = require("./routes/clothingItems");
 

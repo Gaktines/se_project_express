@@ -1,4 +1,6 @@
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../utils/config");
 const User = require("../models/user");
 const { ValidationError } = require("../utils/errors/ValidationError");
 const { NotFoundError } = require("../utils/errors/NotFoundError");
@@ -6,47 +8,58 @@ const { CastError } = require("../utils/errors/CastError");
 const { ServerError } = require("../utils/errors/ServerError");
 const { DuplicateEmailError } = require("../utils/errors/DuplicateEmailError");
 const { AuthorizationError } = require("../utils/errors/AuthorizationError");
-const jwt = require("jsonwebtoken");
-const { JWT_SECRET } = require("../utils/config");
 
 // create User
 const createUser = (req, res) => {
   console.log(req);
   console.log(req.body);
 
-  const { name, avatar, email } = req.body;
+  const { name, avatar, email, password } = req.body;
 
-  User.findOne({ email }).then((user) => {
-    console.log(user);
-    if (user) {
-      const duplicateEmailError = new DuplicateEmailError();
-      return res
-        .status(duplicateEmailError.statusCode)
-        .send({ message: duplicateEmailError.message });
-    }
-    bcrypt.hash(req.body.password, 10).then((hash) =>
-      User.create({ name, avatar, email, password: hash })
-        .then((user) => {
-          console.log(user);
-          res.status(200).send({
-            data: { name: user.name, avatar: user.avatar, email: user.email },
-          });
-        })
-        .catch((e) => {
-          if (e.name && e.name === "ValidationError") {
-            console.log(ValidationError);
-            const validationError = new ValidationError();
-            return res
-              .status(validationError.statusCode)
-              .send({ message: validationError.message });
-          }
-          const serverError = new ServerError();
-          return res
-            .status(serverError.statusCode)
-            .send({ message: serverError.message });
-        }),
-    );
-  });
+  if (!email || !password) {
+    const authorizationError = new AuthorizationError();
+    return res
+      .status(authorizationError.statusCode)
+      .send({ message: authorizationError.message });
+  } else {
+    User.findOne({ email }).then((user) => {
+      console.log(user);
+      if (user) {
+        const duplicateEmailError = new DuplicateEmailError();
+        return res
+          .status(duplicateEmailError.statusCode)
+          .send({ message: duplicateEmailError.message });
+      } else {
+        return bcrypt.hash(req.body.password, 10).then((hash) =>
+          User.create({ name, avatar, email, password: hash })
+            .then(() => {
+              console.log(user);
+              res.status(200).send({
+                data: {
+                  name: user.name,
+                  avatar: user.avatar,
+                  email: user.email,
+                },
+              });
+            })
+            .catch((e) => {
+              if (e.name && e.name === "ValidationError") {
+                console.log(ValidationError);
+                const validationError = new ValidationError();
+                return res
+                  .status(validationError.statusCode)
+                  .send({ message: validationError.message });
+              }
+              console.log("throwing a server error");
+              const serverError = new ServerError();
+              return res
+                .status(serverError.statusCode)
+                .send({ message: serverError.message });
+            }),
+        );
+      }
+    });
+  }
 };
 
 const login = (req, res) => {
@@ -66,7 +79,8 @@ const login = (req, res) => {
         return res
           .status(validationError.statusCode)
           .send({ message: validationError.message });
-      } else if (e.name && e.name === "ServerError") {
+      }
+      if (e.name && e.name === "ServerError") {
         const serverError = new ServerError();
         return res
           .status(serverError.statusCode)

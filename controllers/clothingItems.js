@@ -55,7 +55,12 @@ const deleteItem = (req, res) => {
   ClothingItem.findById(itemId)
     .orFail(() => new NotFoundError())
     .then((item) => {
-      if (item.owner.equals(req.user._id)) {
+      if (!item.owner.equals(req.user._id)) {
+        const forbiddenError = new ForbiddenError();
+        return res
+          .status(forbiddenError.statusCode)
+          .send({ message: forbiddenError.message });
+      } else {
         return ClothingItem.findByIdAndDelete(itemId)
           .orFail(() => new NotFoundError())
           .then(() => res.status(200).send({ message: "item deleted" }))
@@ -77,9 +82,6 @@ const deleteItem = (req, res) => {
               .status(serverError.statusCode)
               .send({ message: serverError.message });
           });
-      } else {
-        const forbiddenError = new ForbiddenError();
-        throw forbiddenError;
       }
     });
 };

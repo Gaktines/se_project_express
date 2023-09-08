@@ -40,10 +40,11 @@ user.statics.findUserByCredentials = function findUserByCredentials(
 ) {
   return this.findOne({ email })
     .select("+password")
-    .then((user) => {
+    .then(() => {
       if (!user) {
         return Promise.reject(new Error("Incorrect email or password"));
-      } else if(!email || !password) {
+      }
+      if (!email || !password) {
         return Promise.reject(new Error("Incorrect email or password"));
       }
 
