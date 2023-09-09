@@ -35,13 +35,13 @@ const createUser = (req, res) => {
     }
     return bcrypt.hash(req.body.password, 10).then((hash) =>
       User.create({ name, avatar, email, password: hash })
-        .then(() => {
+        .then((newUser) => {
           console.log(user);
           res.status(200).send({
             data: {
-              name: user.name,
-              avatar: user.avatar,
-              email: user.email,
+              name: newUserser.name,
+              avatar: newUser.avatar,
+              email: newUser.email,
             },
           });
         })
@@ -60,7 +60,20 @@ const createUser = (req, res) => {
             .send({ message: serverError.message });
           }),
     );
-  });
+  }) .catch((e) => {
+    if (e.name && e.name === "ValidationError") {
+      console.log(ValidationError);
+      const validationError = new ValidationError();
+      return res
+        .status(validationError.statusCode)
+        .send({ message: validationError.message });
+    }
+    console.log("throwing a server error");
+    const serverError = new ServerError();
+    return res
+      .status(serverError.statusCode)
+      .send({ message: serverError.message });
+    });
 };
 
 const login = (req, res) => {
@@ -119,6 +132,7 @@ const updateProfile = (req, res) => {
   const { name, avatar } = req.body;
 
   User.findByIdAndUpdate(
+    req.user._id,
     { name, avatar },
     {
       new: true,
