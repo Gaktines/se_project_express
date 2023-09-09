@@ -20,7 +20,10 @@ const createUser = (req, res) => {
     const authorizationError = new AuthorizationError();
     return res
       .status(authorizationError.statusCode)
-      .send({ message: authorizationError.message });
+      .send({ message: authorizationError.message })
+      .catch((e) => {
+        console.error(e);
+      });
   }
   User.findOne({ email }).then((user) => {
     console.log(user);
