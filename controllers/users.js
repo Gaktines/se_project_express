@@ -21,45 +21,43 @@ const createUser = (req, res) => {
     return res
       .status(authorizationError.statusCode)
       .send({ message: authorizationError.message });
-  } else {
-    User.findOne({ email }).then((user) => {
-      console.log(user);
-      if (user) {
-        const duplicateEmailError = new DuplicateEmailError();
-        return res
-          .status(duplicateEmailError.statusCode)
-          .send({ message: duplicateEmailError.message });
-      } else {
-        return bcrypt.hash(req.body.password, 10).then((hash) =>
-          User.create({ name, avatar, email, password: hash })
-            .then(() => {
-              console.log(user);
-              res.status(200).send({
-                data: {
-                  name: user.name,
-                  avatar: user.avatar,
-                  email: user.email,
-                },
-              });
-            })
-            .catch((e) => {
-              if (e.name && e.name === "ValidationError") {
-                console.log(ValidationError);
-                const validationError = new ValidationError();
-                return res
-                  .status(validationError.statusCode)
-                  .send({ message: validationError.message });
-              }
-              console.log("throwing a server error");
-              const serverError = new ServerError();
-              return res
-                .status(serverError.statusCode)
-                .send({ message: serverError.message });
-            }),
-        );
-      }
-    });
   }
+  User.findOne({ email }).then((user) => {
+    console.log(user);
+    if (user) {
+      const duplicateEmailError = new DuplicateEmailError();
+      return res
+        .status(duplicateEmailError.statusCode)
+        .send({ message: duplicateEmailError.message });
+    }
+    return bcrypt.hash(req.body.password, 10).then((hash) =>
+      User.create({ name, avatar, email, password: hash })
+        .then(() => {
+          console.log(user);
+          res.status(200).send({
+            data: {
+              name: user.name,
+              avatar: user.avatar,
+              email: user.email,
+            },
+          });
+        })
+        .catch((e) => {
+          if (e.name && e.name === "ValidationError") {
+            console.log(ValidationError);
+            const validationError = new ValidationError();
+            return res
+              .status(validationError.statusCode)
+              .send({ message: validationError.message });
+          }
+          console.log("throwing a server error");
+          const serverError = new ServerError();
+          return res
+            .status(serverError.statusCode)
+            .send({ message: serverError.message });
+        }),
+    );
+  });
 };
 
 const login = (req, res) => {
@@ -73,28 +71,21 @@ const login = (req, res) => {
       res.status(201).send({ token });
     })
     .catch((e) => {
-      if (e.name && e.name === "ValidationError") {
-        console.log(ValidationError);
-        const validationError = new ValidationError();
+      if (e.message === "Incorrect email or password") {
+        const authorizationError = new AuthorizationError();
         return res
-          .status(validationError.statusCode)
-          .send({ message: validationError.message });
+          .status(authorizationError.statusCode)
+          .send({ message: authorizationError.message });
       }
-      if (e.name && e.name === "ServerError") {
-        const serverError = new ServerError();
-        return res
-          .status(serverError.statusCode)
-          .send({ message: serverError.message });
-      }
-      const authorizationError = new AuthorizationError();
+      const serverError = new ServerError();
       return res
-        .status(authorizationError.statusCode)
-        .send({ message: authorizationError.message });
+        .status(serverError.statusCode)
+        .send({ message: serverError.message });
     });
 };
 
 const getCurrentUser = (req, res) => {
-  const { userId } = req.user._id;
+  const userId = req.user._id;
 
   User.findById(userId)
     .orFail(() => new NotFoundError())
@@ -125,18 +116,22 @@ const updateProfile = (req, res) => {
   const { name, avatar } = req.body;
 
   User.findByIdAndUpdate(
-    req.params.id,
     { name, avatar },
     {
       new: true,
       runValidators: true,
     },
   )
-    .then((user) => {
-      return res.status(200).res.send({ data: user });
-    })
+    .then((user) => res.status(200).res.send({ data: user }))
     .catch((e) => {
       console.log(e);
+      if (e.name && e.name === "ValidationError") {
+        console.log(ValidationError);
+        const validationError = new ValidationError();
+        return res
+          .status(validationError.statusCode)
+          .send({ message: validationError.message });
+      }
       if (e.name && e.name === "CastError") {
         const castError = new CastError();
         return res

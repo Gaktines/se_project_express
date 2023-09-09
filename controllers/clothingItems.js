@@ -60,7 +60,7 @@ const deleteItem = (req, res) => {
         return res
           .status(forbiddenError.statusCode)
           .send({ message: forbiddenError.message });
-      } else {
+      }
         return ClothingItem.findByIdAndDelete(itemId)
           .orFail(() => new NotFoundError())
           .then(() => res.status(200).send({ message: "item deleted" }))
@@ -83,7 +83,7 @@ const deleteItem = (req, res) => {
               .send({ message: serverError.message });
           });
       }
-    });
+    )
 };
 
 module.exports = {
