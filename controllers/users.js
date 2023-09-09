@@ -25,7 +25,7 @@ const createUser = (req, res) => {
         console.error(e);
       });
   }
-  User.findOne({ email }).then((user) => {
+ return User.findOne({ email }).then((user) => {
     console.log(user);
     if (user) {
       const duplicateEmailError = new DuplicateEmailError();
@@ -58,7 +58,7 @@ const createUser = (req, res) => {
           return res
             .status(serverError.statusCode)
             .send({ message: serverError.message });
-        }),
+          }),
     );
   });
 };
