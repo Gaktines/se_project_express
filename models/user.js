@@ -47,12 +47,12 @@ user.statics.findUserByCredentials = function findUserByCredentials(
         return Promise.reject(new Error("Incorrect email or password"));
       }
 
-      return bcrypt.compare(password, user.password).then((matched) => {
+      return bcrypt.compare(password, newUser.password).then((matched) => {
         if (!matched) {
           return Promise.reject(new Error("Incorrect email or password"));
         }
 
-        return user; // now user is available
+        return newUser; // now user is available
       });
     });
 };
