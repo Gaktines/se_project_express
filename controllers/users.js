@@ -23,6 +23,11 @@ const createUser = (req, res) => {
       .send({ message: authorizationError.message })
       .catch((e) => {
         console.error(e);
+        console.log("throwing a server error");
+          const serverError = new ServerError();
+          return res
+            .status(serverError.statusCode)
+            .send({ message: serverError.message });
       });
   }
  return User.findOne({ email }).then((user) => {
@@ -46,6 +51,7 @@ const createUser = (req, res) => {
           });
         })
         .catch((e) => {
+          console.error(e);
           if (e.name && e.name === "ValidationError") {
             console.log(ValidationError);
             const validationError = new ValidationError();
@@ -61,6 +67,7 @@ const createUser = (req, res) => {
           }),
     );
   }) .catch((e) => {
+    console.error(e);
     if (e.name && e.name === "ValidationError") {
       console.log(ValidationError);
       const validationError = new ValidationError();
@@ -87,6 +94,7 @@ const login = (req, res) => {
       res.status(201).send({ token });
     })
     .catch((e) => {
+      console.error(e);
       if (e.message === "Incorrect email or password") {
         const authorizationError = new AuthorizationError();
         return res
@@ -107,7 +115,7 @@ const getCurrentUser = (req, res) => {
     .orFail(() => new NotFoundError())
     .then((user) => res.status(200).send({ data: user }))
     .catch((e) => {
-      console.log(e);
+      console.error(e);
       if (e.name && e.name === "CastError") {
         const castError = new CastError();
         return res
@@ -141,7 +149,7 @@ const updateProfile = (req, res) => {
   )
     .then((user) => res.status(200).res.send({ data: user }))
     .catch((e) => {
-      console.log(e);
+      console.error(e);
       if (e.name && e.name === "ValidationError") {
         console.log(ValidationError);
         const validationError = new ValidationError();

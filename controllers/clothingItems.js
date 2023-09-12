@@ -20,7 +20,7 @@ const createItem = (req, res) => {
       res.send({ data: item });
     })
     .catch((e) => {
-      console.log(e);
+      console.error(e);
       if (e.name === "ValidationError") {
         const validationError = new ValidationError();
         return res
@@ -39,7 +39,7 @@ const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
     .catch((e) => {
-      console.log(e);
+      console.error(e);
       const serverError = new ServerError();
       return res
         .status(serverError.statusCode)
@@ -65,6 +65,7 @@ const deleteItem = (req, res) => {
         .orFail(() => new NotFoundError())
         .then(() => res.status(200).send({ message: "item deleted" }))
         .catch((e) => {
+          console.error(e);
           if (e.name === "CastError") {
             const castError = new CastError();
             return res

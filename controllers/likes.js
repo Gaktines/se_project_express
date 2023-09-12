@@ -14,7 +14,7 @@ module.exports.likeItem = (req, res) =>
     .orFail(() => new NotFoundError())
     .then((items) => res.status(200).send(items))
     .catch((e) => {
-      console.log(e);
+      console.error(e);
       if (e.name && e.name === "CastError") {
         const castError = new CastError();
         return res
@@ -35,7 +35,7 @@ module.exports.likeItem = (req, res) =>
         return res
           .status(serverError.statusCode)
           .send({ message: serverError.message });
-          
+
     });
 
 module.exports.dislikeItem = (req, res) =>
@@ -47,7 +47,7 @@ module.exports.dislikeItem = (req, res) =>
     .orFail(() => new NotFoundError())
     .then((items) => res.status(200).send(items))
     .catch((e) => {
-      console.log(e);
+      console.error(e);
       if (e.name && e.name === "CastError") {
         const castError = new CastError();
         return res
