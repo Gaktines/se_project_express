@@ -2,7 +2,7 @@
 
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
-const AuthorizationError = require("../utils/errors/AuthorizationError");
+const { AuthorizationError } = require("../utils/errors/AuthorizationError");
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
@@ -20,6 +20,7 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
+    console.log(AuthorizationError);
     const authorizationError = new AuthorizationError();
     return res
       .status(authorizationError.statusCode)
@@ -28,5 +29,5 @@ module.exports = (req, res, next) => {
 
   req.user = payload; // assigning the payload to the request object
 
- return next(); // sending the request to the next middleware
+  return next(); // sending the request to the next middleware
 };
