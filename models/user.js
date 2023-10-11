@@ -11,7 +11,6 @@ const user = new mongoose.Schema({
   },
   avatar: {
     type: String,
-    required: true,
     validate: {
       validator: (v) => validator.isURL(v),
       message: "This is not a Link",

@@ -20,7 +20,7 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
-    console.log(AuthorizationError);
+    console.error(err);
     const authorizationError = new AuthorizationError();
     return res
       .status(authorizationError.statusCode)
