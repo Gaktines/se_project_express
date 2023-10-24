@@ -24,62 +24,64 @@ const createUser = (req, res) => {
       .catch((e) => {
         console.error(e);
         console.log("throwing a server error");
-          const serverError = new ServerError();
-          return res
-            .status(serverError.statusCode)
-            .send({ message: serverError.message });
+        const serverError = new ServerError();
+        return res
+          .status(serverError.statusCode)
+          .send({ message: serverError.message });
       });
   }
- return User.findOne({ email }).then((user) => {
-    console.log(user);
-    if (user) {
-      const duplicateEmailError = new DuplicateEmailError();
-      return res
-        .status(duplicateEmailError.statusCode)
-        .send({ message: duplicateEmailError.message });
-    }
-    return bcrypt.hash(req.body.password, 10).then((hash) =>
-      User.create({ name, avatar, email, password: hash })
-        .then((newUser) => {
-          console.log(newUser);
-          res.status(200).send({
-            data: {
-              name: newUser.name,
-              avatar: newUser.avatar,
-              email: newUser.email,
-            },
-          });
-        })
-        .catch((e) => {
-          console.error(e);
-          if (e.name && e.name === "ValidationError") {
-            console.log(ValidationError);
-            const validationError = new ValidationError();
+  return User.findOne({ email })
+    .then((user) => {
+      console.log(user);
+      if (user) {
+        const duplicateEmailError = new DuplicateEmailError();
+        return res
+          .status(duplicateEmailError.statusCode)
+          .send({ message: duplicateEmailError.message });
+      }
+      return bcrypt.hash(req.body.password, 10).then((hash) =>
+        User.create({ name, avatar, email, password: hash })
+          .then((newUser) => {
+            console.log(newUser);
+            res.status(200).send({
+              data: {
+                name: newUser.name,
+                avatar: newUser.avatar,
+                email: newUser.email,
+              },
+            });
+          })
+          .catch((e) => {
+            console.error(e);
+            if (e.name && e.name === "ValidationError") {
+              console.log(ValidationError);
+              const validationError = new ValidationError();
+              return res
+                .status(validationError.statusCode)
+                .send({ message: validationError.message });
+            }
+            console.log("throwing a server error");
+            const serverError = new ServerError();
             return res
-              .status(validationError.statusCode)
-              .send({ message: validationError.message });
-          }
-          console.log("throwing a server error");
-          const serverError = new ServerError();
-          return res
-            .status(serverError.statusCode)
-            .send({ message: serverError.message });
+              .status(serverError.statusCode)
+              .send({ message: serverError.message });
           }),
-    );
-  }) .catch((e) => {
-    console.error(e);
-    if (e.name && e.name === "ValidationError") {
-      console.log(ValidationError);
-      const validationError = new ValidationError();
+      );
+    })
+    .catch((e) => {
+      console.error(e);
+      if (e.name && e.name === "ValidationError") {
+        console.log(ValidationError);
+        const validationError = new ValidationError();
+        return res
+          .status(validationError.statusCode)
+          .send({ message: validationError.message });
+      }
+      console.log("throwing a server error");
+      const serverError = new ServerError();
       return res
-        .status(validationError.statusCode)
-        .send({ message: validationError.message });
-    }
-    console.log("throwing a server error");
-    const serverError = new ServerError();
-    return res
-      .status(serverError.statusCode)
-      .send({ message: serverError.message });
+        .status(serverError.statusCode)
+        .send({ message: serverError.message });
     });
 };
 
@@ -137,6 +139,7 @@ const getCurrentUser = (req, res) => {
 };
 
 const updateProfile = (req, res) => {
+  console.log(res);
   const { name, avatar } = req.body;
 
   User.findByIdAndUpdate(
@@ -147,7 +150,7 @@ const updateProfile = (req, res) => {
       runValidators: true,
     },
   )
-    .then((user) => res.status(200).res.send({ data: user }))
+    .then((user) => res.status(200).send({ data: user }))
     .catch((e) => {
       console.error(e);
       if (e.name && e.name === "ValidationError") {
