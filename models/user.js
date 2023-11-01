@@ -12,7 +12,7 @@ const user = new mongoose.Schema({
   avatar: {
     type: String,
     validate: {
-      validator: (v) => validator.isURL(v),
+      validator: (v) => validator.isURL(v) || v === undefined || "",
       message: "This is not a Link",
     },
   },

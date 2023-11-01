@@ -15,7 +15,6 @@ const clothingItem = new mongoose.Schema({
   },
   imageUrl: {
     type: String,
-    required: true,
     validate: {
       validator: (v) => validator.isURL(v),
       message: "This is not a Link",
