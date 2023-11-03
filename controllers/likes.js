@@ -2,9 +2,9 @@ const ClothingItem = require("../models/clothingItem");
 const { ValidationError } = require("../utils/errors/ValidationError");
 const { CastError } = require("../utils/errors/CastError");
 const { NotFoundError } = require("../utils/errors/NotFoundError");
-const { ServerError } = require("../utils/errors/ServerError");
+const { BadRequestError } = require("../utils/errors/BadRequestError");
 
-module.exports.likeItem = (req, res) =>
+module.exports.likeItem = (req, res, next) =>
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: { likes: req.user._id } }, // add _id to the array if it's not there yet
@@ -16,26 +16,14 @@ module.exports.likeItem = (req, res) =>
     .catch((e) => {
       console.error(e);
       if (e.name && e.name === "CastError") {
-        const castError = new CastError();
-        return res
-          .status(castError.statusCode)
-          .send({ message: castError.message });
-      } if (e.name && e.name === "ValidationError") {
-        const validationError = new ValidationError();
-        return res
-          .status(validationError.statusCode)
-          .send({ message: validationError.message });
-      } if (e.name &&  e.name === "NotFoundError"){
-        const notFoundError = new NotFoundError();
-        return res
-          .status(notFoundError.statusCode)
-          .send({ message: notFoundError.message });
+        next(new CastError("Error in likeItem"));
+      } else if (e.name && e.name === "ValidationError") {
+        next(new ValidationError("Error in likeItem"));
+      } else if (e.name && e.name === "NotFoundError") {
+        next(new NotFoundError("Error in likeItem"));
+      } else {
+        next(e);
       }
-      const serverError = new ServerError();
-        return res
-          .status(serverError.statusCode)
-          .send({ message: serverError.message });
-
     });
 
 module.exports.dislikeItem = (req, res) =>
@@ -49,24 +37,12 @@ module.exports.dislikeItem = (req, res) =>
     .catch((e) => {
       console.error(e);
       if (e.name && e.name === "CastError") {
-        const castError = new CastError();
-        return res
-          .status(castError.statusCode)
-          .send({ message: castError.message });
+        next(new CastError("Error in likeItem"));
+      } else if (e.name && e.name === "ValidationError") {
+        next(new ValidationError("Error in likeItem"));
+      } else if (e.name && e.name === "NotFoundError") {
+        next(new NotFoundError("Error in likeItem"));
+      } else {
+        next(e);
       }
-      if (e.name && e.name === "ValidationError") {
-        const validationError = new ValidationError();
-        return res
-          .status(validationError.statusCode)
-          .send({ message: validationError.message });
-      } if (e.name && e.name === "NotFoundError") {
-        const notFoundError = new NotFoundError();
-        return res
-          .status(notFoundError.statusCode)
-          .send({ message: notFoundError.message });
-      }
-      const serverError = new ServerError();
-        return res
-          .status(serverError.statusCode)
-          .send({ message: serverError.message });
     });

@@ -8,9 +8,11 @@ const { CastError } = require("../utils/errors/CastError");
 const { ServerError } = require("../utils/errors/ServerError");
 const { DuplicateEmailError } = require("../utils/errors/DuplicateEmailError");
 const { AuthorizationError } = require("../utils/errors/AuthorizationError");
+const { BadRequestError } = require("../utils/errors/BadRequestError");
+const { UnauthorizedError } = require("../utils/errors/UnauthorizedError");
 
 // create User
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   console.log(req);
   console.log(req.body);
 
@@ -55,16 +57,10 @@ const createUser = (req, res) => {
             console.error(e);
             if (e.name && e.name === "ValidationError") {
               console.log(ValidationError);
-              const validationError = new ValidationError();
-              return res
-                .status(validationError.statusCode)
-                .send({ message: validationError.message });
+              next(new ValidationError("Error in createUser"));
+            } else if (e.name === "BadRequestError") {
+              next(new BadRequestError("Error in createUser"));
             }
-            console.log("throwing a server error");
-            const serverError = new ServerError();
-            return res
-              .status(serverError.statusCode)
-              .send({ message: serverError.message });
           }),
       );
     })
@@ -72,20 +68,14 @@ const createUser = (req, res) => {
       console.error(e);
       if (e.name && e.name === "ValidationError") {
         console.log(ValidationError);
-        const validationError = new ValidationError();
-        return res
-          .status(validationError.statusCode)
-          .send({ message: validationError.message });
+        next(new ValidationError("Error in createUser"));
+      } else if (e.name === "BadRequestError") {
+        next(new BadRequestError("Error in createUser"));
       }
-      console.log("throwing a server error");
-      const serverError = new ServerError();
-      return res
-        .status(serverError.statusCode)
-        .send({ message: serverError.message });
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   User.findUserByCredentials(email, password)
@@ -98,19 +88,14 @@ const login = (req, res) => {
     .catch((e) => {
       console.error(e);
       if (e.message === "Incorrect email or password") {
-        const authorizationError = new AuthorizationError();
-        return res
-          .status(authorizationError.statusCode)
-          .send({ message: authorizationError.message });
+        next(new UnauthorizedError("Error in login"));
+      } else if (e.name === "BadRequestError") {
+        next(new BadRequestError("Error in login"));
       }
-      const serverError = new ServerError();
-      return res
-        .status(serverError.statusCode)
-        .send({ message: serverError.message });
     });
 };
 
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
 
   User.findById(userId)
@@ -119,26 +104,16 @@ const getCurrentUser = (req, res) => {
     .catch((e) => {
       console.error(e);
       if (e.name && e.name === "CastError") {
-        const castError = new CastError();
-        return res
-          .status(castError.statusCode)
-          .send({ message: castError.message });
+        next(new CastError("Error in getCurrentUser"));
+      } else if (e.name === "NotFoundError") {
+        next(new NotFoundError("Error in getCurrentUser"));
+      } else {
+        next(e);
       }
-      if (e.name && e.name === "NotFoundError") {
-        console.log("throwing a NotFoundError");
-        const notFoundError = new NotFoundError();
-        return res
-          .status(notFoundError.statusCode)
-          .send({ message: notFoundError.message });
-      }
-      const serverError = new ServerError();
-      return res
-        .status(serverError.statusCode)
-        .send({ message: serverError.message });
     });
 };
 
-const updateProfile = (req, res) => {
+const updateProfile = (req, res, next) => {
   console.log(res);
   const { name, avatar } = req.body;
 
@@ -154,29 +129,12 @@ const updateProfile = (req, res) => {
     .catch((e) => {
       console.error(e);
       if (e.name && e.name === "ValidationError") {
-        console.log(ValidationError);
-        const validationError = new ValidationError();
-        return res
-          .status(validationError.statusCode)
-          .send({ message: validationError.message });
+        next(new ValidationError("Error in updateProfile"));
+      } else if (e.name === "CastError") {
+        next(new CastError("Error in updateProfile"));
+      } else {
+        next(e);
       }
-      if (e.name && e.name === "CastError") {
-        const castError = new CastError();
-        return res
-          .status(castError.statusCode)
-          .send({ message: castError.message });
-      }
-      if (e.name && e.name === "NotFoundError") {
-        console.log("throwing a NotFoundError");
-        const notFoundError = new NotFoundError();
-        return res
-          .status(notFoundError.statusCode)
-          .send({ message: notFoundError.message });
-      }
-      const serverError = new ServerError();
-      return res
-        .status(serverError.statusCode)
-        .send({ message: serverError.message });
     });
 };
 
