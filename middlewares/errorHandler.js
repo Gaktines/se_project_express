@@ -1,4 +1,4 @@
-module.exports = (err, req, res, next) => {
+const errorHandler = (err, req, res, next) => {
   console.log(err);
   const { statusCode = 500, message } = err;
   res
@@ -8,3 +8,5 @@ module.exports = (err, req, res, next) => {
     });
     next();
 };
+
+module.exports = {errorHandler};
