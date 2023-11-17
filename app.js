@@ -26,6 +26,10 @@ app.use(cors());
 app.use(express.json());
 
 app.use(requestLogger);
+
+app.post("/signin", login);
+app.post("/signup", createUser);
+
 app.use(routes);
 
 app.use(errorLogger);
@@ -33,8 +37,7 @@ app.use(errors());
 console.log(errorHandler);
 app.use(errorHandler);
 
-app.post("/signin", login);
-app.post("/signup", createUser);
+
 
 
 
