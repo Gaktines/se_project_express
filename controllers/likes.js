@@ -25,7 +25,7 @@ module.exports.likeItem = (req, res, next) =>
       }
     });
 
-module.exports.dislikeItem = (req, res) =>
+module.exports.dislikeItem = (req, res, next) =>
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } }, // remove _id from the array
