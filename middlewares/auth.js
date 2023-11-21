@@ -1,17 +1,15 @@
 // middleware/auth.js
 
 const jwt = require("jsonwebtoken");
-const { JWT_SECRET } = require("../utils/config");
 const { AuthorizationError } = require("../utils/errors/AuthorizationError");
+
+const {JWT_SECRET='dev-secret'} = process.env;
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith("Bearer ")) {
-    const authorizationError = new AuthorizationError();
-    return res
-      .status(authorizationError.statusCode)
-      .send({ message: authorizationError.message });
+    return next(new AuthorizationError());
   }
 
   const token = authorization.replace("Bearer ", "");
@@ -21,10 +19,7 @@ module.exports = (req, res, next) => {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
     console.error(err);
-    const authorizationError = new AuthorizationError();
-    return res
-      .status(authorizationError.statusCode)
-      .send({ message: authorizationError.message });
+    return next(new AuthorizationError());
   }
 
   req.user = payload; // assigning the payload to the request object

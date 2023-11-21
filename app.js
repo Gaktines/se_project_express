@@ -1,9 +1,12 @@
+require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const  {errorHandler}  = require("./middlewares/errorHandler");
 const { errors } = require("celebrate");
+const  {errorHandler}  = require("./middlewares/errorHandler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
+const validateUserCred = require("./middlewares/validation");
+const validateUserInfoBody = require("./middlewares/validation");
 
 const { PORT = 3001 } = process.env;
 const app = express();
@@ -33,8 +36,8 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.post("/signin", login);
-app.post("/signup", createUser);
+app.post("/signin", validateUserCred, login);
+app.post("/signup", validateUserInfoBody, createUser);
 
 app.use(routes);
 

@@ -3,18 +3,18 @@ const clothingItem = require("./clothingItems");
 const user = require("./users");
 const like = require("./likes");
 const { NotFoundError } = require("../utils/errors/NotFoundError");
+const validateUserInfoBody = require("../middlewares/validation");
+const validateCardBody = require("../middlewares/validation");
+const validateUserCred = require("../middlewares/validation");
 
-router.use("/items", clothingItem);
+router.use("/items", validateCardBody, clothingItem);
 
-router.use("/users", user);
+router.use("/users", validateUserInfoBody, user);
 
-router.use("/items", like);
+router.use("/items", validateUserCred, like);
 
-router.use((req, res) => {
-  const notFoundError = new NotFoundError();
-  return res
-    .status(notFoundError.statusCode)
-    .send({ message: notFoundError.message });
+router.use(() => {
+  throw new new NotFoundError();
 });
 
 module.exports = router;

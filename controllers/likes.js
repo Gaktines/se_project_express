@@ -2,7 +2,6 @@ const ClothingItem = require("../models/clothingItem");
 const { ValidationError } = require("../utils/errors/ValidationError");
 const { CastError } = require("../utils/errors/CastError");
 const { NotFoundError } = require("../utils/errors/NotFoundError");
-const { BadRequestError } = require("../utils/errors/BadRequestError");
 
 module.exports.likeItem = (req, res, next) =>
   ClothingItem.findByIdAndUpdate(

@@ -1,15 +1,14 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { JWT_SECRET } = require("../utils/config");
 const User = require("../models/user");
 const { ValidationError } = require("../utils/errors/ValidationError");
 const { NotFoundError } = require("../utils/errors/NotFoundError");
 const { CastError } = require("../utils/errors/CastError");
-const { ServerError } = require("../utils/errors/ServerError");
 const { DuplicateEmailError } = require("../utils/errors/DuplicateEmailError");
 const { AuthorizationError } = require("../utils/errors/AuthorizationError");
-const { BadRequestError } = require("../utils/errors/BadRequestError");
-const { UnauthorizedError } = require("../utils/errors/UnauthorizedError");
+
+const {JWT_SECRET='dev-secret'} = process.env;
+
 
 // create User
 const createUser = (req, res, next) => {
@@ -18,28 +17,11 @@ const createUser = (req, res, next) => {
 
   const { name, avatar, email, password } = req.body;
 
-  if (!email || !password) {
-    const authorizationError = new AuthorizationError();
-    return res
-      .status(authorizationError.statusCode)
-      .send({ message: authorizationError.message })
-      .catch((e) => {
-        console.error(e);
-        console.log("throwing a server error");
-        const serverError = new ServerError();
-        return res
-          .status(serverError.statusCode)
-          .send({ message: serverError.message });
-      });
-  }
   return User.findOne({ email })
     .then((user) => {
       console.log(user);
       if (user) {
-        const duplicateEmailError = new DuplicateEmailError();
-        return res
-          .status(duplicateEmailError.statusCode)
-          .send({ message: duplicateEmailError.message });
+        return next(DuplicateEmailError());
       }
       return bcrypt.hash(req.body.password, 10).then((hash) =>
         User.create({ name, avatar, email, password: hash })
@@ -58,8 +40,8 @@ const createUser = (req, res, next) => {
             if (e.name && e.name === "ValidationError") {
               console.log(ValidationError);
               next(new ValidationError("Error in createUser"));
-            } else if (e.name === "BadRequestError") {
-              next(new BadRequestError("Error in createUser"));
+            } else  {
+              next(e);
             }
           }),
       );
@@ -69,8 +51,8 @@ const createUser = (req, res, next) => {
       if (e.name && e.name === "ValidationError") {
         console.log(ValidationError);
         next(new ValidationError("Error in createUser"));
-      } else if (e.name === "BadRequestError") {
-        next(new BadRequestError("Error in createUser"));
+      } else {
+        next(e);
       }
     });
 };
@@ -88,9 +70,9 @@ const login = (req, res, next) => {
     .catch((e) => {
       console.error(e);
       if (e.message === "Incorrect email or password") {
-        next(new UnauthorizedError("Error in login"));
-      } else if (e.name === "BadRequestError") {
-        next(new BadRequestError("Error in login"));
+        next(new AuthorizationError("Error in login"));
+      } else {
+        next(e);
       }
     });
 };

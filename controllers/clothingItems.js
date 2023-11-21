@@ -29,10 +29,10 @@ const createItem = (req, res, next) => {
 const getItems = (req, res, next) => {
   console.log(req);
   ClothingItem.find({})
-    .then((items) => res.status(200).send(items))
+    .then((items) => res.status(201).send(items))
     .catch((e) => {
       console.log(e);
-      if (e.name === "BadRequestError") {
+      if (res.status !== 201) {
         next(new BadRequestError("Error in getItems"));
       } else {
         next(e);
@@ -50,7 +50,13 @@ const deleteItem = (req, res, next) => {
         const forbiddenError = new ForbiddenError();
         return res
           .status(forbiddenError.statusCode)
-          .send({ message: forbiddenError.message });
+          .send({ message: forbiddenError.message })
+          .catch((e) => {
+            if (e.name === "CastError") {
+              next(new CastError("Error in deleteItem"));
+            } else {
+              next(e);
+          }});
       }
       return ClothingItem.findByIdAndDelete(itemId)
         .orFail(() => new NotFoundError())
