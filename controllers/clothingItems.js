@@ -2,7 +2,6 @@ const ClothingItem = require("../models/clothingItem");
 const { ValidationError } = require("../utils/errors/ValidationError");
 const { NotFoundError } = require("../utils/errors/NotFoundError");
 const { CastError } = require("../utils/errors/CastError");
-const { BadRequestError } = require("../utils/errors/BadRequestError");
 const { ForbiddenError } = require("../utils/errors/ForbiddenError");
 
 const createItem = (req, res, next) => {
@@ -32,11 +31,8 @@ const getItems = (req, res, next) => {
     .then((items) => res.status(201).send(items))
     .catch((e) => {
       console.log(e);
-      if (res.status !== 201) {
-        next(new BadRequestError("Error in getItems"));
-      } else {
         next(e);
-      }
+
     });
 };
 
@@ -47,10 +43,7 @@ const deleteItem = (req, res, next) => {
     .orFail(() => new NotFoundError())
     .then((item) => {
       if (!item.owner.equals(req.user._id)) {
-        const forbiddenError = new ForbiddenError();
-        return res
-          .status(forbiddenError.statusCode)
-          .send({ message: forbiddenError.message })
+        return next(new ForbiddenError())
           .catch((e) => {
             if (e.name === "CastError") {
               next(new CastError("Error in deleteItem"));
@@ -68,8 +61,15 @@ const deleteItem = (req, res, next) => {
             next(e);
           }
         });
-    });
+    })
+    .catch((e) => {
+      if (e.name === "CastError") {
+        next(new CastError("Error in deleteItem"));
+      } else {
+        next(e);
+    }});
 };
+
 module.exports = {
   createItem,
   getItems,

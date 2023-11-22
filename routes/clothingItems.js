@@ -1,22 +1,25 @@
-const router = require('express').Router();
+const router = require("express").Router();
 const auth = require("../middlewares/auth");
-const validateCardBody = require("../middlewares/validation");
-const validateUserCred = require("../middlewares/validation");
+const { validateCardBody, validateId } = require("../middlewares/validation");
 
-const { createItem, getItems, deleteItem } = require('../controllers/clothingItems');
+const {
+  createItem,
+  getItems,
+  deleteItem,
+} = require("../controllers/clothingItems");
 
 // Read
-router.get('/', validateCardBody, getItems);
+router.get("/", getItems);
 
 router.use(auth);
 // CRUD
 
 // Create
-router.post('/', validateCardBody, createItem);
+router.post("/", validateCardBody, createItem);
 
 // Update
 
 // Delete
-router.delete('/:itemId', validateUserCred, deleteItem);
+router.delete("/:itemId", validateId, deleteItem);
 
 module.exports = router;

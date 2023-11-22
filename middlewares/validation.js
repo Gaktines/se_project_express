@@ -3,12 +3,14 @@
 const { Joi, celebrate } = require("celebrate");
 const validator = require("validator");
 
+// validate URL
+
 const validateURL = (value, helpers) => {
   if (validator.isURL(value)) {
     return value;
   }
-  return helpers.error('string.uri');
-}
+  return helpers.error("string.uri");
+};
 
 module.exports.validateCardBody = celebrate({
   body: Joi.object().keys({
@@ -39,35 +41,35 @@ module.exports.validateUserInfoBody = celebrate({
       "string.empty": 'The "name" field must be filled in',
     }),
 
-    imageUrl: Joi.string().required().custom(validateURL).messages({
+    avatar: Joi.string().required().custom(validateURL).messages({
       "string.empty": 'The "imageUrl" field must be filled in',
       "string.uri": 'the "imageUrl" field must be a valid url',
     }),
 
     email: Joi.string().required().email().messages({
       "string.empty": 'The "email" field is required',
-      "string.email": 'Must be a valid email address',
+      "string.email": "Must be a valid email address",
     }),
 
     password: Joi.string().required().messages({
       "string.empty": "Password is required",
     }),
-  })
-})
+  }),
+});
 // validate user credential when they login
 
 module.exports.validateUserCred = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email().messages({
       "string.empty": 'The "email" field is required',
-      "string.email": 'Must be a valid email address',
+      "string.email": "Must be a valid email address",
     }),
 
     password: Joi.string().required().messages({
       "string.empty": "Password is required",
     }),
-  })
-})
+  }),
+});
 // validate user and clothihng items when they are accessed
 
 module.exports.validateId = celebrate({
@@ -76,5 +78,19 @@ module.exports.validateId = celebrate({
   }),
 });
 
-// validate URL
+// Validate name and avatar
 
+module.exports.validateUser = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30).messages({
+      "string.min": 'The minimum length of the "name" field is 2',
+      "string.max": 'The maximum length of the "name" field is 30',
+      "string.empty": 'The "name" field must be filled in',
+    }),
+
+    avatar: Joi.string().required().custom(validateURL).messages({
+      "string.empty": 'The "imageUrl" field must be filled in',
+      "string.uri": 'the "imageUrl" field must be a valid url',
+    }),
+  }),
+});
