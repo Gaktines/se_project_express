@@ -31,8 +31,7 @@ const getItems = (req, res, next) => {
     .then((items) => res.status(201).send(items))
     .catch((e) => {
       console.log(e);
-        next(e);
-
+      next(e);
     });
 };
 
@@ -43,13 +42,7 @@ const deleteItem = (req, res, next) => {
     .orFail(() => new NotFoundError())
     .then((item) => {
       if (!item.owner.equals(req.user._id)) {
-        return next(new ForbiddenError())
-          .catch((e) => {
-            if (e.name === "CastError") {
-              next(new CastError("Error in deleteItem"));
-            } else {
-              next(e);
-          }});
+        return next(new ForbiddenError());
       }
       return ClothingItem.findByIdAndDelete(itemId)
         .orFail(() => new NotFoundError())
@@ -67,7 +60,8 @@ const deleteItem = (req, res, next) => {
         next(new CastError("Error in deleteItem"));
       } else {
         next(e);
-    }});
+      }
+    });
 };
 
 module.exports = {

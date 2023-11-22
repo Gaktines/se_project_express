@@ -21,7 +21,7 @@ const createUser = (req, res, next) => {
     .then((user) => {
       console.log(user);
       if (user) {
-        return next(DuplicateEmailError());
+        return next(new DuplicateEmailError());
       }
       return bcrypt.hash(req.body.password, 10).then((hash) =>
         User.create({ name, avatar, email, password: hash })
